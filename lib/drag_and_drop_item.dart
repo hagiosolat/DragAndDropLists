@@ -20,7 +20,7 @@ class DragAndDropItem implements DragAndDropInterface {
   //additions
   bool get isFolder => article == null;
   final String title;
-  final Article? article;
+  Article? article;
   final List<DragAndDropItem> children;
   DragAndDropItem? parent;
 
