@@ -1,4 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:drag_and_drop_lists/drag_and_drop_interface.dart';
 import 'package:flutter/material.dart'; //additional
 import 'package:flutter/widgets.dart';
