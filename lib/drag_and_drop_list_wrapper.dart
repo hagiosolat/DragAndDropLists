@@ -3,33 +3,97 @@ import 'package:drag_and_drop_lists/drag_and_drop_list_interface.dart';
 import 'package:drag_and_drop_lists/drag_handle.dart';
 import 'package:drag_and_drop_lists/measure_size.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:responsive_1/src/features/priority_view/presentation/controllers/priorities_controller.dart';
+import 'package:responsive_1/src/features/priority_view/presentation/controllers/priority_view_controllers.dart';
+import 'package:responsive_1/src/features/priority_view/presentation/widgets.dart';
 
-class DragAndDropListWrapper extends StatefulWidget {
+class DragAndDropListWrapper extends ConsumerStatefulWidget {
   final DragAndDropListInterface dragAndDropList;
   final DragAndDropBuilderParameters parameters;
+  final int index;
 
   const DragAndDropListWrapper(
-      {required this.dragAndDropList, required this.parameters, super.key});
+      {required this.dragAndDropList,
+      required this.parameters,
+      super.key,
+      required this.index});
 
   @override
-  State<StatefulWidget> createState() => _DragAndDropListWrapper();
+  ConsumerState<DragAndDropListWrapper> createState() =>
+      _DragAndDropListWrapper();
 }
 
-class _DragAndDropListWrapper extends State<DragAndDropListWrapper>
+class _DragAndDropListWrapper extends ConsumerState<DragAndDropListWrapper>
     with TickerProviderStateMixin {
   DragAndDropListInterface? _hoveredDraggable;
 
   bool _dragging = false;
   Size _containerSize = Size.zero;
   Size _dragHandleSize = Size.zero;
+  late ScrollController _controller;
+  bool headerVisibility = false;
+  void _scrollListener() {
+    if (_controller.hasClients) {
+      double currentOffset = _controller.offset;
+
+      if (currentOffset > 45) {
+        setState(() {
+          headerVisibility = true;
+          ref.read(hideMiniHeaderProvider.notifier).setTo(false);
+        });
+      } else {
+        setState(() {
+          headerVisibility = false;
+        });
+      }
+    }
+  }
 
   @override
   void initState() {
     super.initState();
+    _controller = ScrollController();
+    _controller.addListener(_scrollListener);
+    headerVisibility = false;
   }
 
   @override
   Widget build(BuildContext context) {
+    var swappedIndexes = ref.watch(reorderedListIndexProvider);
+    print("rebuilt list wrapper: ${widget.index}");
+    if (swappedIndexes.int1 == widget.index ||
+        swappedIndexes.int2 == widget.index) {
+      setState(() {
+        headerVisibility = false;
+        Future.delayed(
+            const Duration(milliseconds: 300),
+            () => ref
+                .read(reorderedListIndexProvider.notifier)
+                .updateReorderedListIndexes(-1, -1));
+      });
+    }
+    if (ref.watch(hideMiniHeaderProvider)) {
+      setState(() {
+        headerVisibility = false;
+      });
+    }
+
+    var priorities = ref.watch(priorityListProvider);
+    var currentPriority = priorities.firstWhere(
+      (p) => p.index == widget.index,
+    );
+    ref.watch(priorityViewDataProvider).whenData(
+      (value) {
+        var currentList =
+            value.firstWhere((l) => l.priorityId == currentPriority.id);
+        if (currentList.children.length < 2) {
+          setState(() {
+            headerVisibility = false;
+          });
+        }
+      },
+    );
     Widget dragAndDropListContents =
         widget.dragAndDropList.generateWidget(widget.parameters);
 
@@ -209,10 +273,23 @@ class _DragAndDropListWrapper extends State<DragAndDropListWrapper>
     }
     if (widget.parameters.axis == Axis.horizontal &&
         !widget.parameters.disableScrolling) {
-      toReturn = SingleChildScrollView(
-        child: Container(
-          child: toReturn,
-        ),
+      toReturn = Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          AnimatedVisibilityWidget(
+              index: widget.index,
+              listWidth: widget.parameters.listWidth,
+              currentPriority: currentPriority,
+              headerVisibility: headerVisibility,
+              dragging: _dragging),
+          Expanded(
+              child: SingleChildScrollView(
+            controller: _controller,
+            child: Container(
+              child: toReturn,
+            ),
+          ))
+        ],
       );
     }
 
