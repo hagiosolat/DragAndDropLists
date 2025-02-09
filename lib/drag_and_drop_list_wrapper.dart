@@ -60,7 +60,6 @@ class _DragAndDropListWrapper extends ConsumerState<DragAndDropListWrapper>
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollListener();
-      print("POSTFRAME CALLED");
     });
     var priorities = ref.watch(priorityListProvider);
     var currentPriority = priorities.firstWhere(
