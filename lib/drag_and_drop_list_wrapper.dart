@@ -5,7 +5,6 @@ import 'package:drag_and_drop_lists/measure_size.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_1/src/features/priority_view/presentation/controllers/priorities_controller.dart';
-import 'package:responsive_1/src/features/priority_view/presentation/controllers/priority_view_controllers.dart';
 import 'package:responsive_1/src/features/priority_view/presentation/widgets.dart';
 
 class DragAndDropListWrapper extends ConsumerStatefulWidget {
@@ -37,12 +36,11 @@ class _DragAndDropListWrapper extends ConsumerState<DragAndDropListWrapper>
     if (_controller.hasClients) {
       double currentOffset = _controller.offset;
 
-      if (currentOffset > 45) {
+      if (currentOffset > 45 && !headerVisibility) {
         setState(() {
           headerVisibility = true;
-          ref.read(hideMiniHeaderProvider.notifier).setTo(false);
         });
-      } else {
+      } else if (currentOffset <= 45 && headerVisibility) {
         setState(() {
           headerVisibility = false;
         });
@@ -60,39 +58,13 @@ class _DragAndDropListWrapper extends ConsumerState<DragAndDropListWrapper>
 
   @override
   Widget build(BuildContext context) {
-    var swappedIndexes = ref.watch(reorderedListIndexProvider);
-    print("rebuilt list wrapper: ${widget.index}");
-    if (swappedIndexes.int1 == widget.index ||
-        swappedIndexes.int2 == widget.index) {
-      setState(() {
-        headerVisibility = false;
-        Future.delayed(
-            const Duration(milliseconds: 300),
-            () => ref
-                .read(reorderedListIndexProvider.notifier)
-                .updateReorderedListIndexes(-1, -1));
-      });
-    }
-    if (ref.watch(hideMiniHeaderProvider)) {
-      setState(() {
-        headerVisibility = false;
-      });
-    }
-
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollListener();
+      print("POSTFRAME CALLED");
+    });
     var priorities = ref.watch(priorityListProvider);
     var currentPriority = priorities.firstWhere(
       (p) => p.index == widget.index,
-    );
-    ref.watch(priorityViewDataProvider).whenData(
-      (value) {
-        var currentList =
-            value.firstWhere((l) => l.priorityId == currentPriority.id);
-        if (currentList.children.length < 2) {
-          setState(() {
-            headerVisibility = false;
-          });
-        }
-      },
     );
     Widget dragAndDropListContents =
         widget.dragAndDropList.generateWidget(widget.parameters);
