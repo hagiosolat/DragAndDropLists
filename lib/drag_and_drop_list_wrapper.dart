@@ -5,6 +5,7 @@ import 'package:drag_and_drop_lists/measure_size.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_1/src/features/priority_view/presentation/controllers/priorities_controller.dart';
+import 'package:responsive_1/src/features/priority_view/presentation/controllers/priority_view_controllers.dart';
 import 'package:responsive_1/src/features/priority_view/presentation/widgets.dart';
 
 class DragAndDropListWrapper extends ConsumerStatefulWidget {
@@ -57,10 +58,19 @@ class _DragAndDropListWrapper extends ConsumerState<DragAndDropListWrapper>
   }
 
   @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollListener();
     });
+    if (ref.watch(isPriorityListDraggingProvider) && _controller.hasClients) {
+      _controller.jumpTo(0);
+    }
     var priorities = ref.watch(priorityListProvider);
     var currentPriority = priorities.firstWhere(
       (p) => p.index == widget.index,
@@ -364,6 +374,7 @@ class _DragAndDropListWrapper extends ConsumerState<DragAndDropListWrapper>
     if (_dragging != dragging && mounted) {
       setState(() {
         _dragging = dragging;
+        ref.read(isPriorityListDraggingProvider.notifier).setTo(dragging);
       });
       if (widget.parameters.onListDraggingChanged != null) {
         widget.parameters.onListDraggingChanged!(
