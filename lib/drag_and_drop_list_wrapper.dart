@@ -37,11 +37,11 @@ class _DragAndDropListWrapper extends ConsumerState<DragAndDropListWrapper>
     if (_controller.hasClients) {
       double currentOffset = _controller.offset;
 
-      if (currentOffset > 45 && !headerVisibility) {
+      if (currentOffset > 36 && !headerVisibility) {
         setState(() {
           headerVisibility = true;
         });
-      } else if (currentOffset <= 45 && headerVisibility) {
+      } else if (currentOffset <= 36 && headerVisibility) {
         setState(() {
           headerVisibility = false;
         });
@@ -55,6 +55,11 @@ class _DragAndDropListWrapper extends ConsumerState<DragAndDropListWrapper>
     _controller = ScrollController();
     _controller.addListener(_scrollListener);
     headerVisibility = false;
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) => ref
+          .read(priorityListsScrollControllerProvider.notifier)
+          .registerScrollController(_controller),
+    );
   }
 
   @override
