@@ -73,9 +73,6 @@ class _DragAndDropListWrapper extends ConsumerState<DragAndDropListWrapper>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollListener();
     });
-    if (ref.watch(isPriorityListDraggingProvider) && _controller.hasClients) {
-      _controller.jumpTo(0);
-    }
     var priorities = ref.watch(priorityListProvider);
     var currentPriority = priorities.firstWhere(
       (p) => p.index == widget.index,
@@ -273,12 +270,16 @@ class _DragAndDropListWrapper extends ConsumerState<DragAndDropListWrapper>
               ))
             ],
           ),
-          AnimatedVisibilityWidget(
-              index: widget.index,
-              listWidth: widget.parameters.listWidth,
-              currentPriority: currentPriority,
-              headerVisibility: headerVisibility,
-              dragging: _dragging),
+          Positioned(
+            top: 0,
+            right: 0,
+            child: AnimatedVisibilityWidget(
+                index: widget.index,
+                listWidth: widget.parameters.listWidth,
+                currentPriority: currentPriority,
+                headerVisibility: headerVisibility,
+                dragging: _dragging),
+          ),
         ],
       );
     }
@@ -383,7 +384,6 @@ class _DragAndDropListWrapper extends ConsumerState<DragAndDropListWrapper>
     if (_dragging != dragging && mounted) {
       setState(() {
         _dragging = dragging;
-        ref.read(isPriorityListDraggingProvider.notifier).setTo(dragging);
       });
       if (widget.parameters.onListDraggingChanged != null) {
         widget.parameters.onListDraggingChanged!(
