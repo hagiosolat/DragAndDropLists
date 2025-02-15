@@ -259,22 +259,26 @@ class _DragAndDropListWrapper extends ConsumerState<DragAndDropListWrapper>
     }
     if (widget.parameters.axis == Axis.horizontal &&
         !widget.parameters.disableScrolling) {
-      toReturn = Column(
-        mainAxisSize: MainAxisSize.min,
+      toReturn = Stack(
         children: [
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Expanded(
+                  child: SingleChildScrollView(
+                controller: _controller,
+                child: Container(
+                  child: toReturn,
+                ),
+              ))
+            ],
+          ),
           AnimatedVisibilityWidget(
               index: widget.index,
               listWidth: widget.parameters.listWidth,
               currentPriority: currentPriority,
               headerVisibility: headerVisibility,
               dragging: _dragging),
-          Expanded(
-              child: SingleChildScrollView(
-            controller: _controller,
-            child: Container(
-              child: toReturn,
-            ),
-          ))
         ],
       );
     }
