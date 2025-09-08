@@ -71,7 +71,7 @@ class DragAndDropItem implements DragAndDropInterface {
       key: key ?? this.key,
       title: title ?? this.title,
       article: article ?? this.article,
-      onartiCleDataCallback: onartiCleDataCallback ?? this.oonartiCleDataCallback,
+      onartiCleDataCallback: onartiCleDataCallback ?? this.onartiCleDataCallback,
     );
   }
 }
