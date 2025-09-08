@@ -6,7 +6,7 @@ import 'package:responsive_1/src/features/priority_view/presentation/widgets.dar
 
 class DragAndDropItem implements DragAndDropInterface {
   /// The child widget of this item.
- Widget child;
+  Widget child;
 
   /// Widget when draggable
   Widget? feedbackWidget;
@@ -22,6 +22,7 @@ class DragAndDropItem implements DragAndDropInterface {
   Article? article;
   final List<DragAndDropItem> children;
   DragAndDropItem? parent;
+  Function(Article, bool)? onartiCleDataCallback;
 
   DragAndDropItem({
     this.feedbackWidget,
@@ -32,11 +33,13 @@ class DragAndDropItem implements DragAndDropInterface {
     required this.title,
     Iterable<DragAndDropItem>? childList,
     this.article,
+    this.onartiCleDataCallback,
   }) : children = <DragAndDropItem>[] {
     if (isFolder) {
       child = MyFeedbackWidget(title);
     } else {
-      child = DragAndDropContainer(article!);
+      child = DragAndDropContainer(article!,
+          onartiCleDataCallback: (p0, p1){});
     }
     if (feedbackWidget == null) {
       var fb = MyFeedbackWidget(title);
