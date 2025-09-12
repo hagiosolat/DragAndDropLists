@@ -39,7 +39,7 @@ class DragAndDropItem implements DragAndDropInterface {
       child = MyFeedbackWidget(title);
     } else {
       child = DragAndDropContainer(article!,
-          onartiCleDataCallback: onartiCleDataCallback);
+          onArticleDataCallback: onartiCleDataCallback);
     }
     if (feedbackWidget == null) {
       var fb = MyFeedbackWidget(title);
