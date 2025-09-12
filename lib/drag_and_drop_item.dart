@@ -22,7 +22,7 @@ class DragAndDropItem implements DragAndDropInterface {
   Article? article;
   final List<DragAndDropItem> children;
   DragAndDropItem? parent;
-  Function(Article, bool) onartiCleDataCallback;
+  Function(Article, bool)? onartiCleDataCallback;
 
   DragAndDropItem({
     this.feedbackWidget,
