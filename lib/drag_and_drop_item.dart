@@ -22,7 +22,7 @@ class DragAndDropItem implements DragAndDropInterface {
   Article? article;
   final List<DragAndDropItem> children;
   DragAndDropItem? parent;
-  Function(Article, bool)? onartiCleDataCallback;
+
 
   DragAndDropItem({
     this.feedbackWidget,
@@ -33,7 +33,7 @@ class DragAndDropItem implements DragAndDropInterface {
     required this.title,
     Iterable<DragAndDropItem>? childList,
     this.article,
-   // required this.onartiCleDataCallback,
+    Function(Article, bool)? onartiCleDataCallback,
   }) : children = <DragAndDropItem>[] {
     if (isFolder) {
       child = MyFeedbackWidget(title);
